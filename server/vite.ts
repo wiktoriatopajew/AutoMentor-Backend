@@ -1,8 +1,8 @@
-﻿import { Express } from "express";
+import { Express } from "express";
 import { Server } from "http";
 
 export function log(message: string) {
-  console.log([express] );
+  console.log(`[express] ${message}`);
 }
 
 export async function setupVite(app: Express, server: Server) {
@@ -11,10 +11,9 @@ export async function setupVite(app: Express, server: Server) {
 
 export function serveStatic(app: Express) {
   console.log("Static file serving skipped - backend-only deployment");
-  
   app.get("/", (req, res) => {
-    res.json({ 
-      message: "AutoMentor Backend API", 
+    res.json({
+      message: "AutoMentor Backend API",
       status: "running",
       timestamp: new Date().toISOString()
     });
