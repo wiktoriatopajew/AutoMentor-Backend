@@ -78,9 +78,9 @@ CREATE TABLE IF NOT EXISTS referral_rewards (
   awarded_at TIMESTAMP
 );
 
--- Google Ads configuration table
+-- Google Ads configuration table (changed to TEXT PRIMARY KEY for consistency)
 CREATE TABLE IF NOT EXISTS google_ads_config (
-  id SERIAL PRIMARY KEY,
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   conversion_id TEXT,
   purchase_label TEXT,
   signup_label TEXT,
@@ -88,9 +88,9 @@ CREATE TABLE IF NOT EXISTS google_ads_config (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- App configuration table
+-- App configuration table (changed to TEXT PRIMARY KEY for consistency)
 CREATE TABLE IF NOT EXISTS app_config (
-  id SERIAL PRIMARY KEY,
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   stripe_publishable_key TEXT,
   stripe_secret_key TEXT,
   stripe_webhook_secret TEXT,
@@ -132,9 +132,9 @@ CREATE TABLE IF NOT EXISTS analytics_events (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Daily statistics table
+-- Daily statistics table (changed to TEXT PRIMARY KEY for consistency)
 CREATE TABLE IF NOT EXISTS daily_stats (
-  id SERIAL PRIMARY KEY,
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   date TEXT NOT NULL UNIQUE,
   total_users INTEGER DEFAULT 0,
   new_users INTEGER DEFAULT 0,
