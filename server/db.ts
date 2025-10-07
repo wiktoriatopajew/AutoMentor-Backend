@@ -4,6 +4,7 @@ import * as schema from "../shared/schema";
 
 // Database configuration - using PostgreSQL for Railway deployment
 let db: any;
+let sql: any; // Will be initialized with the postgres client
 
 console.log('Database config check:');
 console.log('NODE_ENV:', process.env.NODE_ENV);
@@ -14,6 +15,7 @@ async function initializeDatabase() {
   // Use PostgreSQL (required for Railway deployment)
   const databaseUrl = process.env.DATABASE_URL || 'postgresql://user:pass@localhost:5432/db';
   const client = postgres(databaseUrl);
+  sql = client; // Set sql for export
   db = drizzlePg(client, { schema });
 
   // Migrations are permanently disabled. No migration logic will run.
@@ -32,4 +34,4 @@ async function initializeDatabase() {
 
 // Initialize database
 const dbReady = initializeDatabase().then(() => db);
-export { db, dbReady };
+export { db, dbReady, sql };

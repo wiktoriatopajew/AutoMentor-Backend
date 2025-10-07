@@ -7,6 +7,9 @@ import MemoryStore from "memorystore";
 import helmet from "helmet";
 import { registerRoutes } from "./routes";
 import { storage } from "./storage";
+import * as fs from "fs";
+import * as path from "path";
+import Stripe from "stripe";
 
 // Simple logging function
 function log(message: string, source = "express") {
@@ -18,8 +21,40 @@ function log(message: string, source = "express") {
   });
   console.log(`${formattedTime} [${source}] ${message}`);
 }
-import fs from "fs";
-import Stripe from "stripe";
+
+// Auto-create database tables if they don't exist
+async function ensureDatabaseTables() {
+  try {
+    const { db, sql } = await import("./db");
+    
+    // Try to query users table to check if it exists
+    const testQuery = await db.execute(sql`SELECT 1 FROM users LIMIT 1`);
+    console.log('✅ Database tables already exist');
+  } catch (error) {
+    console.log('🚀 Tables not found, creating database structure...');
+    
+    try {
+      // Read and execute the schema SQL file
+      const schemaPath = path.join(process.cwd(), 'init-schema.sql');
+      if (fs.existsSync(schemaPath)) {
+        const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+        
+        // Import postgres client
+        const postgres = (await import('postgres')).default;
+        const client = postgres(process.env.DATABASE_URL || 'postgresql://user:pass@localhost:5432/db');
+        
+        // Execute the schema creation
+        await client.unsafe(schemaSql);
+        await client.end();
+        console.log('✅ Database tables created successfully');
+      } else {
+        console.warn('⚠️ init-schema.sql not found, skipping auto-creation');
+      }
+    } catch (createError) {
+      console.warn('⚠️ Could not auto-create tables:', String(createError));
+    }
+  }
+}
 
 const app = express();
 
@@ -221,6 +256,9 @@ import { dbReady } from "./db";
 (async () => {
   // Wait for database migrations to complete before starting the server
   await dbReady;
+
+  // Ensure database tables exist before initializing admin user
+  await ensureDatabaseTables();
 
   // Initialize admin user after database is ready
   storage.initAdminUser();
