@@ -12,7 +12,7 @@ import {
   type Testimonial, type InsertTestimonial,
   users, subscriptions, chatSessions, messages, attachments, referralRewards, googleAdsConfig, appConfig,
   analyticsEvents, contentPages, faqs, testimonials, dailyStats, revenueAnalytics
-} from "@shared/schema";
+} from "../shared/schema";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 import { db } from "./db";

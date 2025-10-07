@@ -3,10 +3,31 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "echo 'No build needed'",
-    "start": "node server/index.ts"
+    "dev": "tsx server/index.ts",
+    "build": "esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "start": "tsx server/index.ts"
   },
   "dependencies": {
-    "express": "latest"
+    "express": "latest",
+    "express-session": "latest",
+    "express-rate-limit": "latest",
+    "memorystore": "latest",
+    "helmet": "latest",
+    "dotenv": "latest",
+    "stripe": "latest",
+    "zod": "latest",
+    "multer": "latest",
+    "better-sqlite3": "latest",
+    "drizzle-orm": "latest",
+    "postgres": "latest",
+    "bcryptjs": "latest",
+    "tsx": "latest",
+    "typescript": "latest",
+    "@types/express": "latest",
+    "@types/express-session": "latest",
+    "@types/multer": "latest",
+    "@types/better-sqlite3": "latest",
+    "@types/bcryptjs": "latest",
+    "@types/node": "latest"
   }
 }

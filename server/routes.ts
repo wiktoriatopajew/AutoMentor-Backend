@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertSubscriptionSchema, insertChatSessionSchema, insertMessageSchema, insertUserSchema, insertAttachmentSchema } from "@shared/schema";
+import { insertSubscriptionSchema, insertChatSessionSchema, insertMessageSchema, insertUserSchema, insertAttachmentSchema } from "../shared/schema";
 import { z } from "zod";
 import rateLimit from "express-rate-limit";
 import multer from "multer";
