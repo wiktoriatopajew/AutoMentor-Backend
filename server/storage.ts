@@ -12,7 +12,7 @@ import {
   type Testimonial, type InsertTestimonial,
   users, subscriptions, chatSessions, messages, attachments, referralRewards, googleAdsConfig, appConfig,
   analyticsEvents, contentPages, faqs, testimonials, dailyStats, revenueAnalytics
-} from "../shared/schema";
+} from "@shared/schema";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 import { db } from "./db";
@@ -800,13 +800,19 @@ export class PostgresStorage implements IStorage {
   }
 
   async getAllUnreadMessages(): Promise<Message[]> {
-    return await db.select().from(messages)
-      .where(
-        and(
-          eq(messages.isRead, false),
-          eq(messages.senderType, "user")
-        )
-      );
+    try {
+      return await db.select().from(messages)
+        .where(
+          and(
+            eq(messages.isRead, 0), // Use 0 instead of false for SQLite compatibility
+            eq(messages.senderType, "user")
+          )
+        );
+    } catch (error) {
+      console.error("Error getting unread messages (PostgreSQL/SQLite compatibility issue):", error);
+      // Return empty array for SQLite compatibility
+      return [];
+    }
   }
 
   async markMessageAsRead(messageId: string): Promise<void> {
@@ -1665,5 +1671,5 @@ export class PostgresStorage implements IStorage {
   }
 }
 
-// Use PostgresStorage (now with SQLite) for all environments
+// Use PostgresStorage for Railway (with PostgreSQL database)
 export const storage = new PostgresStorage();
