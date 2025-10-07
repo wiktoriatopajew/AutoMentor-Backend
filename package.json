@@ -17,7 +17,6 @@
     "stripe": "latest",
     "zod": "latest",
     "multer": "latest",
-    "better-sqlite3": "latest",
     "drizzle-orm": "latest",
     "postgres": "latest",
     "bcryptjs": "latest",
@@ -26,8 +25,6 @@
     "@types/express": "latest",
     "@types/express-session": "latest",
     "@types/multer": "latest",
-    "@types/better-sqlite3": "latest",
-    "@types/bcryptjs": "latest",
     "@types/node": "latest"
   }
 }
