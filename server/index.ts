@@ -263,7 +263,8 @@ import { dbReady } from "./db";
   console.log(`Environment: ${process.env.NODE_ENV}`);
   console.log(`Port: ${port}`);
   console.log(`Host: ${host}`);
-  console.log(`Frontend dist path: ${path.resolve(import.meta.dirname, "..", "dist", "public")}`);
+  console.log(`Working directory: ${process.cwd()}`);
+  console.log(`Frontend dist path: ${path.resolve(process.cwd(), "dist", "public")}`);
   
   // Add global error handlers
   process.on('uncaughtException', (err) => {
