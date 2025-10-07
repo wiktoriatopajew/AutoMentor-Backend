@@ -1,10 +1,27 @@
--- Auto-generated PostgreSQL schema for AutoMentor
+-- Clean PostgreSQL schema for AutoMentor
 -- This file will be executed automatically if tables don't exist
+
+-- Drop all tables first to ensure clean state
+DROP TABLE IF EXISTS revenue_analytics CASCADE;
+DROP TABLE IF EXISTS media_library CASCADE;
+DROP TABLE IF EXISTS testimonials CASCADE;
+DROP TABLE IF EXISTS faqs CASCADE;
+DROP TABLE IF EXISTS content_pages CASCADE;
+DROP TABLE IF EXISTS daily_stats CASCADE;
+DROP TABLE IF EXISTS analytics_events CASCADE;
+DROP TABLE IF EXISTS app_config CASCADE;
+DROP TABLE IF EXISTS google_ads_config CASCADE;
+DROP TABLE IF EXISTS referral_rewards CASCADE;
+DROP TABLE IF EXISTS attachments CASCADE;
+DROP TABLE IF EXISTS messages CASCADE;
+DROP TABLE IF EXISTS chat_sessions CASCADE;
+DROP TABLE IF EXISTS subscriptions CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users table
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
@@ -20,7 +37,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Subscriptions table
-CREATE TABLE IF NOT EXISTS subscriptions (
+CREATE TABLE subscriptions (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id TEXT REFERENCES users(id),
   amount REAL,
@@ -30,7 +47,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 );
 
 -- Chat sessions table
-CREATE TABLE IF NOT EXISTS chat_sessions (
+CREATE TABLE chat_sessions (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id TEXT REFERENCES users(id),
   vehicle_info TEXT,
@@ -40,7 +57,7 @@ CREATE TABLE IF NOT EXISTS chat_sessions (
 );
 
 -- Messages table
-CREATE TABLE IF NOT EXISTS messages (
+CREATE TABLE messages (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id TEXT REFERENCES chat_sessions(id),
   sender_id TEXT REFERENCES users(id),
@@ -51,7 +68,7 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 -- Attachments table
-CREATE TABLE IF NOT EXISTS attachments (
+CREATE TABLE attachments (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   message_id TEXT REFERENCES messages(id),
   file_name TEXT NOT NULL,
@@ -64,7 +81,7 @@ CREATE TABLE IF NOT EXISTS attachments (
 );
 
 -- Referral rewards table
-CREATE TABLE IF NOT EXISTS referral_rewards (
+CREATE TABLE referral_rewards (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   referrer_id TEXT REFERENCES users(id),
   referred_id TEXT REFERENCES users(id),
@@ -78,8 +95,8 @@ CREATE TABLE IF NOT EXISTS referral_rewards (
   awarded_at TIMESTAMP
 );
 
--- Google Ads configuration table (changed to TEXT PRIMARY KEY for consistency)
-CREATE TABLE IF NOT EXISTS google_ads_config (
+-- Google Ads configuration table
+CREATE TABLE google_ads_config (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   conversion_id TEXT,
   purchase_label TEXT,
@@ -88,8 +105,8 @@ CREATE TABLE IF NOT EXISTS google_ads_config (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- App configuration table (changed to TEXT PRIMARY KEY for consistency)
-CREATE TABLE IF NOT EXISTS app_config (
+-- App configuration table
+CREATE TABLE app_config (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   stripe_publishable_key TEXT,
   stripe_secret_key TEXT,
@@ -113,7 +130,7 @@ CREATE TABLE IF NOT EXISTS app_config (
 );
 
 -- Analytics events table
-CREATE TABLE IF NOT EXISTS analytics_events (
+CREATE TABLE analytics_events (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   event_type TEXT NOT NULL,
   event_name TEXT NOT NULL,
@@ -132,8 +149,8 @@ CREATE TABLE IF NOT EXISTS analytics_events (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Daily statistics table (changed to TEXT PRIMARY KEY for consistency)
-CREATE TABLE IF NOT EXISTS daily_stats (
+-- Daily statistics table
+CREATE TABLE daily_stats (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   date TEXT NOT NULL UNIQUE,
   total_users INTEGER DEFAULT 0,
@@ -152,7 +169,7 @@ CREATE TABLE IF NOT EXISTS daily_stats (
 );
 
 -- Revenue analytics table
-CREATE TABLE IF NOT EXISTS revenue_analytics (
+CREATE TABLE revenue_analytics (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id TEXT REFERENCES users(id),
   subscription_id TEXT REFERENCES subscriptions(id),
@@ -169,7 +186,7 @@ CREATE TABLE IF NOT EXISTS revenue_analytics (
 );
 
 -- Content pages table (CMS)
-CREATE TABLE IF NOT EXISTS content_pages (
+CREATE TABLE content_pages (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   page_key TEXT NOT NULL UNIQUE,
   title TEXT NOT NULL,
@@ -189,7 +206,7 @@ CREATE TABLE IF NOT EXISTS content_pages (
 );
 
 -- FAQs table
-CREATE TABLE IF NOT EXISTS faqs (
+CREATE TABLE faqs (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
@@ -201,7 +218,7 @@ CREATE TABLE IF NOT EXISTS faqs (
 );
 
 -- Testimonials table
-CREATE TABLE IF NOT EXISTS testimonials (
+CREATE TABLE testimonials (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   email TEXT,
@@ -217,7 +234,7 @@ CREATE TABLE IF NOT EXISTS testimonials (
 );
 
 -- Media library table
-CREATE TABLE IF NOT EXISTS media_library (
+CREATE TABLE media_library (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   filename TEXT NOT NULL,
   original_name TEXT NOT NULL,
@@ -233,21 +250,21 @@ CREATE TABLE IF NOT EXISTS media_library (
 );
 
 -- Add indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_referral_code ON users(referral_code);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
-CREATE INDEX IF NOT EXISTS idx_chat_sessions_user_id ON chat_sessions(user_id);
-CREATE INDEX IF NOT EXISTS idx_messages_session_id ON messages(session_id);
-CREATE INDEX IF NOT EXISTS idx_messages_sender_id ON messages(sender_id);
-CREATE INDEX IF NOT EXISTS idx_attachments_message_id ON attachments(message_id);
-CREATE INDEX IF NOT EXISTS idx_referral_rewards_referrer_id ON referral_rewards(referrer_id);
-CREATE INDEX IF NOT EXISTS idx_referral_rewards_referred_id ON referral_rewards(referred_id);
-CREATE INDEX IF NOT EXISTS idx_analytics_events_user_id ON analytics_events(user_id);
-CREATE INDEX IF NOT EXISTS idx_analytics_events_created_at ON analytics_events(created_at);
-CREATE INDEX IF NOT EXISTS idx_revenue_analytics_user_id ON revenue_analytics(user_id);
-CREATE INDEX IF NOT EXISTS idx_content_pages_page_key ON content_pages(page_key);
-CREATE INDEX IF NOT EXISTS idx_faqs_category ON faqs(category);
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_referral_code ON users(referral_code);
+CREATE INDEX idx_subscriptions_user_id ON subscriptions(user_id);
+CREATE INDEX idx_chat_sessions_user_id ON chat_sessions(user_id);
+CREATE INDEX idx_messages_session_id ON messages(session_id);
+CREATE INDEX idx_messages_sender_id ON messages(sender_id);
+CREATE INDEX idx_attachments_message_id ON attachments(message_id);
+CREATE INDEX idx_referral_rewards_referrer_id ON referral_rewards(referrer_id);
+CREATE INDEX idx_referral_rewards_referred_id ON referral_rewards(referred_id);
+CREATE INDEX idx_analytics_events_user_id ON analytics_events(user_id);
+CREATE INDEX idx_analytics_events_created_at ON analytics_events(created_at);
+CREATE INDEX idx_revenue_analytics_user_id ON revenue_analytics(user_id);
+CREATE INDEX idx_content_pages_page_key ON content_pages(page_key);
+CREATE INDEX idx_faqs_category ON faqs(category);
 
 -- Insert default admin user if no users exist
 INSERT INTO users (username, password, email, is_admin)
