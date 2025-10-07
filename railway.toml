@@ -1,0 +1,12 @@
+# Railway Backend Service (Node.js/Express)
+[build]
+command = "npm install && npm run build"
+builder = "NIXPACKS"
+
+[deploy]
+command = "npm start"
+healthcheck = "/api/health"
+restartPolicy = "always"
+
+[env]
+NODE_ENV = "production"
