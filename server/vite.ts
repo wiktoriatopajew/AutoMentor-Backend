@@ -1,4 +1,4 @@
-import { Express } from "express";
+﻿import { Express } from "express";
 import { Server } from "http";
 
 export function log(message: string) {
@@ -18,4 +18,5 @@ export function serveStatic(app: Express) {
       timestamp: new Date().toISOString()
     });
   });
+}
 }
