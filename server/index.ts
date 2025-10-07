@@ -5,56 +5,12 @@ import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import MemoryStore from "memorystore";
 import helmet from "helmet";
+import path from "path";
 import { registerRoutes } from "./routes";
+import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
-import * as fs from "fs";
-import * as path from "path";
+import fs from "fs";
 import Stripe from "stripe";
-
-// Simple logging function
-function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit", 
-    second: "2-digit",
-    hour12: true,
-  });
-  console.log(`${formattedTime} [${source}] ${message}`);
-}
-
-// Auto-create database tables if they don't exist
-async function ensureDatabaseTables() {
-  try {
-    const { db, sql } = await import("./db");
-    
-    // Try to query users table to check if it exists
-    const testQuery = await db.execute(sql`SELECT 1 FROM users LIMIT 1`);
-    console.log('✅ Database tables already exist');
-  } catch (error) {
-    console.log('🚀 Tables not found, creating database structure...');
-    
-    try {
-      // Read and execute the schema SQL file
-      const schemaPath = path.join(process.cwd(), 'init-schema.sql');
-      if (fs.existsSync(schemaPath)) {
-        const schemaSql = fs.readFileSync(schemaPath, 'utf8');
-        
-        // Import postgres client
-        const postgres = (await import('postgres')).default;
-        const client = postgres(process.env.DATABASE_URL || 'postgresql://user:pass@localhost:5432/db');
-        
-        // Execute the schema creation
-        await client.unsafe(schemaSql);
-        await client.end();
-        console.log('✅ Database tables created successfully');
-      } else {
-        console.warn('⚠️ init-schema.sql not found, skipping auto-creation');
-      }
-    } catch (createError) {
-      console.warn('⚠️ Could not auto-create tables:', String(createError));
-    }
-  }
-}
 
 const app = express();
 
@@ -257,9 +213,6 @@ import { dbReady } from "./db";
   // Wait for database migrations to complete before starting the server
   await dbReady;
 
-  // Ensure database tables exist before initializing admin user
-  await ensureDatabaseTables();
-
   // Initialize admin user after database is ready
   storage.initAdminUser();
 
@@ -283,14 +236,34 @@ import { dbReady } from "./db";
     console.error('Server error:', err);
   });
 
-  // Backend only serves API - no frontend serving needed
-  log("Backend API server initialized (no frontend serving)");
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    console.log("Setting up Vite for development...");
+    await setupVite(app, server);
+  } else {
+    console.log("Setting up static file serving for production...");
+    try {
+      serveStatic(app);
+      console.log("Static file serving configured successfully");
+    } catch (error) {
+      console.error("Failed to configure static file serving:", error);
+      throw error;
+    }
+  }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
+  const host = process.env.NODE_ENV === 'production' ? "0.0.0.0" : "localhost";
+  
+  console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log(`Port: ${port}`);
+  console.log(`Host: ${host}`);
+  console.log(`Frontend dist path: ${path.resolve(import.meta.dirname, "..", "dist", "public")}`);
   
   // Add global error handlers
   process.on('uncaughtException', (err) => {
@@ -303,8 +276,8 @@ import { dbReady } from "./db";
   
   server.listen({
     port,
-    host: "localhost",
+    host,
   }, () => {
-    log(`serving on port ${port}`);
+    log(`serving on port ${port}, host: ${host}`);
   });
 })();
