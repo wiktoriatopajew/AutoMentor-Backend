@@ -20,11 +20,13 @@
     "drizzle-orm": "latest",
     "postgres": "latest",
     "bcryptjs": "latest",
+    "nodemailer": "latest",
     "tsx": "latest",
     "typescript": "latest",
     "@types/express": "latest",
     "@types/express-session": "latest",
     "@types/multer": "latest",
+    "@types/nodemailer": "latest",
     "@types/node": "latest"
   }
 }
