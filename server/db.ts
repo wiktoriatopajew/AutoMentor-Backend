@@ -50,7 +50,7 @@ async function initializeDatabase() {
 
   // Debug: print applied migrations from __drizzle_migrations (if exists)
   try {
-    const applied = await clientSELECT id, name, hash, created_at FROM __drizzle_migrations ORDER BY created_at;
+    const applied = await client`SELECT id, name, hash, created_at FROM __drizzle_migrations ORDER BY created_at`;
     console.log('Applied migrations rows:', applied);
   } catch (e) {
     console.warn('Could not read __drizzle_migrations table:', String(e));
