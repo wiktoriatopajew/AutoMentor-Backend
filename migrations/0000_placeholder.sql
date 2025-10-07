@@ -1,4 +1,0 @@
--- 0000_placeholder.sql
--- Safe placeholder to prevent migrator from failing when no real migrations are present.
--- This file is intentionally a no-op: it contains only comments.
--- Remove or replace with real, idempotent migrations when ready.
