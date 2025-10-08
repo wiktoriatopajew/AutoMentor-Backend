@@ -12,8 +12,8 @@
   # Start command
   command = "npm start"
   
-  # Health check path
-  healthcheck = "/api/health"
+  # Health check path - try root endpoint instead
+  healthcheck = "/"
   
   # Restart policy
   restartPolicy = "always"

@@ -190,6 +190,9 @@ declare module 'express-serve-static-core' {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Root endpoint for Railway health check
+  app.get("/", healthCheck);
+  
   // Health check endpoint for Railway and monitoring
   app.get("/api/health", healthCheck);
   app.get("/health", healthCheck);
