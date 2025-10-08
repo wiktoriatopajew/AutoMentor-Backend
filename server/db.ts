@@ -14,20 +14,27 @@ console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
 console.log('DATABASE_URL length:', process.env.DATABASE_URL?.length || 0);
 
 async function initializeDatabase() {
-  // Use PostgreSQL (required for Railway deployment)
-  const databaseUrl = process.env.DATABASE_URL || 'postgresql://user:pass@localhost:5432/db';
-  const client = postgres(databaseUrl);
-  sql = client; // Set sql for export
-  db = drizzlePg(client, { schema });
-
-  // Initialize database schema from init-schema.sql
   try {
-    const schemaPath = path.join(process.cwd(), 'init-schema.sql');
-    if (fs.existsSync(schemaPath)) {
-      console.log('🔧 Initializing database schema from init-schema.sql...');
-      const schemaSQL = fs.readFileSync(schemaPath, 'utf8');
-      
-      // Split by semicolon and execute each statement
+    // Use PostgreSQL (required for Railway deployment)
+    const databaseUrl = process.env.DATABASE_URL || 'postgresql://user:pass@localhost:5432/db';
+    console.log('🔗 Connecting to PostgreSQL...');
+    
+    const client = postgres(databaseUrl);
+    sql = client; // Set sql for export
+    db = drizzlePg(client, { schema });
+
+    // Test connection
+    await client`SELECT 1`;
+    console.log('✅ Database connected successfully');
+
+    // Initialize database schema from init-schema.sql
+    try {
+      const schemaPath = path.join(process.cwd(), 'init-schema.sql');
+      if (fs.existsSync(schemaPath)) {
+        console.log('🔧 Initializing database schema from init-schema.sql...');
+        const schemaSQL = fs.readFileSync(schemaPath, 'utf8');
+        
+        // Split by semicolon and execute each statement
       const statements = schemaSQL.split(';').filter(stmt => stmt.trim().length > 0);
       
       for (const statement of statements) {
@@ -57,6 +64,14 @@ async function initializeDatabase() {
   }
 
   console.log('🗄️ Connected to PostgreSQL database');
+  
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    console.log('⚠️ App will continue without database connection');
+    // Create minimal db object to prevent crashes
+    db = null;
+    sql = null;
+  }
 }
 
 // Initialize database
