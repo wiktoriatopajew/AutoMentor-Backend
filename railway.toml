@@ -17,9 +17,6 @@
   
   # Restart policy
   restartPolicy = "always"
-  
-  # Port override
-  port = 5000
 
 [env]
   # Environment variables that Railway should set
